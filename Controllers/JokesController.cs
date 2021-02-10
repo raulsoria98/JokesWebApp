@@ -94,7 +94,12 @@ namespace JokesWebApp.Controllers
             {
                 return NotFound();
             }
-            return View(joke);
+            else if (joke.User != User.Identity.Name)
+            {
+                return View("Index", await _context.Joke.ToListAsync());
+            }
+            else
+                return View(joke);
         }
 
         // POST: Jokes/Edit/5
@@ -108,6 +113,10 @@ namespace JokesWebApp.Controllers
             if (id != joke.Id)
             {
                 return NotFound();
+            }
+            else if (joke.User != User.Identity.Name)
+            {
+                return View("Index", await _context.Joke.ToListAsync());
             }
 
             if (ModelState.IsValid)
@@ -148,8 +157,12 @@ namespace JokesWebApp.Controllers
             {
                 return NotFound();
             }
-
-            return View(joke);
+            else if (joke.User != User.Identity.Name)
+            {
+                return View("Index", await _context.Joke.ToListAsync());
+            }
+            else
+                return View(joke);
         }
 
         // POST: Jokes/Delete/5
@@ -159,9 +172,17 @@ namespace JokesWebApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var joke = await _context.Joke.FindAsync(id);
-            _context.Joke.Remove(joke);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            
+            if (joke.User != User.Identity.Name)
+            {
+                return View("Index", await _context.Joke.ToListAsync());
+            }
+            else
+            {
+                _context.Joke.Remove(joke);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         private bool JokeExists(int id)
